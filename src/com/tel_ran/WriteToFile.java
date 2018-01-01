@@ -1,6 +1,8 @@
 package com.tel_ran;
 
+import com.tel_ran.annotations.Length;
 import com.tel_ran.annotations.NotNull;
+import com.tel_ran.validators.LengthValidator;
 import com.tel_ran.validators.NotNullValidator;
 
 import java.io.*;
@@ -14,16 +16,12 @@ import java.util.List;
 public class WriteToFile {
     public static void main(String[] args) throws IOException, ClassNotFoundException, IllegalAccessException {
 
-
         List<User> deserialize = deserialize();
+
         serialize(deserialize);
-
-
-
         System.out.println(deserialize.size());
         deserialize.stream().forEach(System.out::println);
     }
-
 
     private static void serialize(List<User> list) throws IOException, IllegalAccessException {
         File file = new File("resourses/users.bin");
@@ -34,7 +32,6 @@ public class WriteToFile {
         User user = new User();
 
         getFieldWithAnnotations(user);
-
 
         System.out.println("Input user name: ");
         user.setUserName(getFromKeyboard(br));
@@ -50,6 +47,8 @@ public class WriteToFile {
 
         System.out.println("Input email: ");
         user.setEmail(getFromKeyboard(br));
+
+
 
         list.add(user);
 
@@ -87,7 +86,7 @@ public class WriteToFile {
                     userName = nInp;
                     break;
                 } else {
-                    if (!nInp.equals(""))//return null;
+                    if (!nInp.equals(""))
                         System.out.println("Empty name not allowed!");
                 }
             } catch (IOException e) {
@@ -96,7 +95,7 @@ public class WriteToFile {
         return userName;
     }
 
-    private static void notNullprocessing(Field field, Object user) throws IllegalAccessException {
+    private static void notNullProcessing(Field field, Object user) throws IllegalAccessException {
         if(field.getAnnotation(NotNull.class) != null){
             field.setAccessible(true);
             Object obj = field.get(user);
@@ -104,11 +103,22 @@ public class WriteToFile {
         }
     }
 
+    private static void lengthProcessing(Field field, Object user) throws IllegalAccessException {
+        boolean annotationPresent = field.isAnnotationPresent(Length.class);
+        if(annotationPresent){
+            Length length = field.getAnnotation(Length.class);
+            field.setAccessible(true);
+            Object obj = field.get(user);
+            LengthValidator.lengthValidate((String)obj, length.minValue(), length.maxValue());
+        }
+    }
+
     public static void getFieldWithAnnotations(Object user) throws IllegalAccessException {
         Field[] fields = user.getClass().getDeclaredFields();
         for(Field field : fields){
             field.setAccessible(true);
-            notNullprocessing(field,user);
+            notNullProcessing(field,user);
+            lengthProcessing(field,user);
         }
     }
 }

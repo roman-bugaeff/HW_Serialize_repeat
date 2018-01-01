@@ -1,5 +1,6 @@
 package com.tel_ran;
 
+import com.tel_ran.annotations.Length;
 import com.tel_ran.annotations.NotNull;
 
 import java.io.Serializable;
@@ -9,14 +10,19 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
     @NotNull
+    @Length
     private String userName;
     @NotNull
+    @Length
     private String password;
     @NotNull
+    @Length
     private String firstName;
     @NotNull
+    @Length
     private String lastName;
     @NotNull
+    @Length
     private String email;
 
 
