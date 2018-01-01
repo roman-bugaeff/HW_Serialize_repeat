@@ -1,6 +1,10 @@
 package com.tel_ran;
 
+import com.tel_ran.annotations.NotNull;
+import com.tel_ran.validators.NotNullValidator;
+
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,18 +12,20 @@ import java.util.List;
  * Created by rbuga on 1/1/2018.
  */
 public class WriteToFile {
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, IllegalAccessException {
 
 
         List<User> deserialize = deserialize();
         serialize(deserialize);
+
+
 
         System.out.println(deserialize.size());
         deserialize.stream().forEach(System.out::println);
     }
 
 
-    private static void serialize(List<User> list) throws IOException {
+    private static void serialize(List<User> list) throws IOException, IllegalAccessException {
         File file = new File("resourses/users.bin");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         FileOutputStream fos = new FileOutputStream(file);
@@ -27,7 +33,9 @@ public class WriteToFile {
 
         User user = new User();
 
-        //while (true) {
+        getFieldWithAnnotations(user);
+
+
         System.out.println("Input user name: ");
         user.setUserName(getFromKeyboard(br));
 
@@ -86,5 +94,21 @@ public class WriteToFile {
             }
         }
         return userName;
+    }
+
+    private static void notNullprocessing(Field field, Object user) throws IllegalAccessException {
+        if(field.getAnnotation(NotNull.class) != null){
+            field.setAccessible(true);
+            Object obj = field.get(user);
+            NotNullValidator.validate(obj);
+        }
+    }
+
+    public static void getFieldWithAnnotations(Object user) throws IllegalAccessException {
+        Field[] fields = user.getClass().getDeclaredFields();
+        for(Field field : fields){
+            field.setAccessible(true);
+            notNullprocessing(field,user);
+        }
     }
 }

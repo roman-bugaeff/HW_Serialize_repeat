@@ -1,15 +1,22 @@
 package com.tel_ran;
 
+import com.tel_ran.annotations.NotNull;
+
 import java.io.Serializable;
 
 /**
  * Created by rbuga on 1/1/2018.
  */
 public class User implements Serializable {
+    @NotNull
     private String userName;
+    @NotNull
     private String password;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String email;
 
 
